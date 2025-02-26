@@ -8,6 +8,12 @@ RSpec.describe Adder do
 
         expect(result).to eq(3)
       end
+
+      it 'return an error' do
+        result = Adder.add(1, 2)
+
+        expect(result).to eq(2)
+      end
     end
   end
 end
