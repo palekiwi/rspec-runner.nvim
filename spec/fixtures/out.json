@@ -1,0 +1,41 @@
+{
+  "version": "3.13.0",
+  "examples": [
+    {
+      "id": "./spec/fixtures/adder_spec.rb[1:1:1:1]",
+      "description": "returns a sum",
+      "full_description":
+        "Adder#add when adding two numbers returns a sum",
+      "status": "passed",
+      "file_path": "./spec/fixtures/adder_spec.rb",
+      "line_number": 6,
+      "run_time": 0.000214562,
+      "pending_message":null
+    },
+    {
+      "id":"./spec/fixtures/adder_spec.rb[1:1:1:2]",
+      "description": "return an error",
+      "full_description": "Adder#add when adding two numbers return an error",
+      "status": "failed",
+      "file_path": "./spec/fixtures/adder_spec.rb",
+      "line_number": 12,
+      "run_time": 0.005595663,
+      "pending_message": null,
+      "exception": {
+        "class": "RSpec::Expectations::ExpectationNotMetError",
+        "message": "\nexpected: 2\ngot: 3\n\n(compared using ==)\n",
+        "backtrace": [
+          "./spec/fixtures/adder_spec.rb:15:in 'block (4 levels) in <top (required)>'"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "duration": 0.008533113,
+    "example_count": 2,
+    "failure_count": 1,
+    "pending_count": 0,
+    "errors_outside_of_examples_count": 0
+  },
+  "summary_line": "2 examples, 1 failure"
+}

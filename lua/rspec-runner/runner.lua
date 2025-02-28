@@ -5,8 +5,10 @@ local parsers = require "nvim-treesitter.parsers"
 
 local M = {}
 
+---@return string[]
 function M.find_nearest()
   local lang = "ruby"
+  local result = {}
 
   parsers.get_parser(0, lang)
   local query = ts.query.parse(lang, rspec_query)
@@ -17,14 +19,15 @@ function M.find_nearest()
     for id, capture_node in query:iter_captures(curnode, 0) do
 
       if query.captures[id] == "test_name" then
-        return ts.get_node_text(capture_node, 0)
+        table.insert(result, 1, ts.get_node_text(capture_node, 0))
+        return result
       end
     end
 
     curnode = curnode:parent()
   end
 
-  return nil
+  return result
 end
 
 vim.keymap.set({ 'n' }, 'rn', M.find_nearest)
