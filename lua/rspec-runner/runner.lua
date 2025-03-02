@@ -3,10 +3,46 @@ local rspec_query = require "rspec-runner.query"
 local ts = vim.treesitter
 local parsers = require "nvim-treesitter.parsers"
 
-local M = {}
+---@alias Runner.Scope "all"
+
+---@class Runner.Opts
+---@field cwd? string
+---@field filename? string
+---@field line? number
+
+---@class Runner
+---@field cwd string
+---@field examples string[]
+---@field filename string
+---@field line number
+---@field files string[]
+---@field scope Runner.Scope
+local Runner = {}
+
+Runner.__index = Runner
+
+---@param scope Runner.Scope
+---@param opts? Runner.Opts
+---@return Runner
+function Runner:new(scope, opts)
+  opts = opts or {}
+
+  self.cwd = opts.cwd or vim.fn.getcwd()
+  self.filename = opts.filename or vim.fn.expand("%")
+  self.line = opts.line or vim.fn.line(".")
+  self.scope = scope
+  self.examples = {}
+  self.files = {}
+
+  return self
+end
+---@return Runner
+function Runner:setup()
+  return self
+end
 
 ---@return string[]
-function M.find_nearest()
+function Runner:find_nearest()
   local lang = "ruby"
   local result = {}
 
@@ -30,6 +66,9 @@ function M.find_nearest()
   return result
 end
 
-vim.keymap.set({ 'n' }, 'rn', M.find_nearest)
+---@return string[]
+function Runner:build_args()
+  return { "--format", "j" }
+end
 
-return M
+return Runner

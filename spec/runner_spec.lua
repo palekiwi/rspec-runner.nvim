@@ -1,16 +1,19 @@
-local rspec_runner = require("lua.rspec-runner.init")
+local helpers = require("spec.helpers")
+local Runner = require("rspec-runner.runner")
 
 local filename = "spec/fixtures/adder_spec.rb"
 
 describe("Runner", function()
-  describe("find_nearest", function()
-    it("finds the name of the test nearest to cursor", function()
-      vim.api.nvim_command(string.format("view +8 %s", filename))
+  describe("#setup", function()
+    it("creates a new runner", function()
+      helpers.view_file(filename, 8)
 
-      local result = rspec_runner.run("nearest")
-      local expected = "returns a sum"
+      local runner = Runner:new("all")
 
-      assert.equal(expected, result.example)
+      assert.equal(vim.fn.getcwd(), runner.cwd)
+      assert.equal(filename, runner.filename)
+      assert.equal(8, runner.line)
+      assert.equal("all", runner.scope)
     end)
   end)
 end)

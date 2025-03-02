@@ -1,23 +1,12 @@
 ---@class State
----@field examples State.Example[]
-
----@class State.Example.Exception
----@field message string
-
----@class State.Example
----@field success boolean
----@field description string
----@field filename string
----@field line number
----@field exception State.Example.Exception
+---@field output? Output
+---@field runner? Runner
 
 local M = {}
 
 ---@return State
 function M.new()
-  return {
-    examples = {}
-  }
+  return {}
 end
 
 return M
