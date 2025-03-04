@@ -6,17 +6,21 @@ local M = {
   state = require("rspec-runner.state").new()
 }
 
-vim.g.state = M.state
+---@param cfg table
+function M.setup(cfg)
+  if cfg ~= nil then
+    M.config = vim.tbl_deep_extend("force", M.config, cfg)
+  end
+end
 
----
----@param scope string: (all|pr|file|nearest|last)
+---@param scope Runner.Scope
 function M.run(scope)
-  local runner = Runner:new(scope)
+  local runner = Runner.new(scope, M.config, {})
 
   M.state.runner = runner
   return executor.execute(runner, M.config, M.state)
 end
 
-vim.keymap.set("n", "<leader>rn", function() M.run("all") end)
+vim.keymap.set("n", "<leader>rn", function() M.run("file") end)
 
 return M

@@ -1,5 +1,4 @@
 local output = require("rspec-runner.output")
-local utils = require("rspec-runner.utils")
 
 local M = {}
 
@@ -65,10 +64,12 @@ function M.execute(runner, config, state)
     if config.qflist then
       vim.diagnostic.setqflist({open = true, namespace = ns, title = "RSpec Failures" })
     end
+
+    vim.g.state = state
   end
 
   return vim.system(
-    utils.concat(config.cmd, runner:build_args()),
+    runner.cmd,
     { stdout = on_stdout },
     function() vim.schedule(on_exit) end
   )
