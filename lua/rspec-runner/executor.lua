@@ -8,6 +8,8 @@ local M = {}
 function M.execute(runner, config, state)
   local ns = config.namespace
 
+  local notification = vim.notify(string.format("Running in scope: %s...", runner.cfg.scope))
+
   local function on_stdout(err, data)
     if err then
       print("An error has occurred: %s", err)
@@ -61,7 +63,23 @@ function M.execute(runner, config, state)
       end
     end
 
-    vim.g.state = state
+    if vim.tbl_isempty(failed) then
+      local summary = state.output.summary
+      local successful = tonumber(summary.example_count) - tonumber(summary.failure_count) - tonumber(summary.pending_count)
+
+      vim.notify(successful .. " passed", vim.log.levels.DEBUG, {
+        replace = notification,
+        title = "[RspecRunner]"
+      })
+    else
+      local body = table.concat({
+        state.output.summary.failure_count .. " failures",
+      }, "\n")
+      vim.notify(body, vim.log.levels.ERROR, {
+        replace = notification,
+        title = "[RspecRunner]"
+      })
+    end
   end
 
   return vim.system(
