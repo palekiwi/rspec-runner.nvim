@@ -10,7 +10,6 @@
 local Config = {
   cmd = { "rspec" },
   diagnostics = true,
-  qflist = true,
   namespace = vim.api.nvim_create_namespace("rspec-runner"),
   notify = true,
   spec_patterns = { "_spec%.rb$" }

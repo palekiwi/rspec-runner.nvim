@@ -14,9 +14,9 @@ describe("Executor", function()
       local output = state.output
 
       assert(output)
-      assert(#output.examples, 2)
-      assert.equal(2, output.summary.example_count)
-      assert.equal(1, output.summary.failure_count)
+      assert(#output.examples, 3)
+      assert.equal(3, output.summary.example_count)
+      assert.equal(2, output.summary.failure_count)
     end)
   end)
 end)

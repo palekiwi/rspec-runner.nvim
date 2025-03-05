@@ -61,10 +61,6 @@ function M.execute(runner, config, state)
       end
     end
 
-    if config.qflist then
-      vim.diagnostic.setqflist({open = true, namespace = ns, title = "RSpec Failures" })
-    end
-
     vim.g.state = state
   end
 
