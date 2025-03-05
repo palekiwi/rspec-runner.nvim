@@ -59,20 +59,32 @@ function M.browse(examples, config)
 
         vim.diagnostic.reset(ns)
 
-        local bufnr = vim.fn.bufnr(ex.file_path, true)
-
         actions.close(prompt_bufnr)
 
-        vim.diagnostic.reset(ns)
-        vim.diagnostic.set(ns, bufnr, { {
-          bufnr = bufnr,
-          lnum = ex.line_number,
-          col = 1,
-          severity = vim.diagnostic.severity.ERROR,
-          source = "rspec-runner",
-          message = ex.exception.message,
-          user_data = {},
-        } }, {})
+        local backtrace = {}
+
+        for _, item in pairs(ex.exception.backtrace) do
+          local file_path, line = string.match(item, "([^:]+):([^:]+):.*")
+          local bufnr = vim.fn.bufnr(file_path, true)
+
+          local entry = {
+            bufnr = bufnr,
+            lnum = tonumber(line) - 1,
+            col = 1,
+            severity = vim.diagnostic.severity.ERROR,
+            source = "rspec-runner",
+            message = "[RspecRunner] Backtrace: " .. ex.description,
+            user_data = {},
+          }
+
+          backtrace[bufnr] = backtrace[bufnr] or {}
+          table.insert(backtrace[bufnr], entry)
+        end
+
+        for bufnr, entries in pairs(backtrace) do
+          vim.diagnostic.set(ns, bufnr, entries, {})
+        end
+
 
         vim.diagnostic.setqflist({ open = true, namespace = ns, title = "[RspecRunner] Backtrace" })
       end, { desc = "Send backtrace qflist" })
