@@ -7,13 +7,24 @@ local M = {
   state = require("rspec-runner.state").new()
 }
 
----@class UserConfig
----@field cmd string[]
-
----@param cfg table
+---@param cfg UserConfig
 function M.setup(cfg)
   if cfg ~= nil then
-    M.config = vim.tbl_deep_extend("force", M.config, cfg)
+    local default_config = cfg.defaults or {}
+    local projects_config = cfg.projects or {}
+    local cwd = vim.fn.getcwd()
+
+    local cwd_overrides = vim.iter(projects_config):find(function(project)
+      return string.match(cwd, project.path)
+    end)
+
+    if cwd_overrides ~= nil then
+      local user_config = vim.tbl_deep_extend("force", default_config, cwd_overrides)
+      M.config = vim.tbl_deep_extend("force", M.config, user_config)
+    else
+      M.config = vim.tbl_deep_extend("force", M.config, default_config)
+    end
+
   end
 
   vim.api.nvim_create_user_command("RspecRunnerAll", function() M.run("all") end, {})
