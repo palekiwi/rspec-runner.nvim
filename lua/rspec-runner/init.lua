@@ -29,12 +29,22 @@ function M.setup(cfg)
 
   vim.api.nvim_create_user_command("RspecRunnerAll", function() M.run("all") end, {})
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
   vim.api.nvim_create_user_command("RspecRunnerResults", function() M.browse(M.state, M.config) end, {})
 end
 
 ---@param scope Runner.Scope
 function M.run(scope)
-  local runner = Runner.new(scope, M.config, {})
+  local runner
+
+  if scope == "last" then
+    assert(M.state.output, "No previous output found")
+    assert(M.state.runner, "No previous runner found")
+
+    runner = Runner.from_last(M.state.runner, M.state.output, M.config)
+  else
+    runner = Runner.new(scope, M.config, {})
+  end
 
   M.state.runner = runner
   return Executor.execute(runner, M.config, M.state)

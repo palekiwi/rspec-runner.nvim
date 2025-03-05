@@ -4,7 +4,7 @@ local utils = require "rspec-runner.utils"
 local ts = vim.treesitter
 local parsers = require "nvim-treesitter.parsers"
 
----@alias Runner.Scope "all" | "file"
+---@alias Runner.Scope "all" | "file" | "last"
 
 ---@class Runner.Opts
 ---@field cwd? string
@@ -56,6 +56,34 @@ function M.new(scope, config, opts)
   return { cmd = cmd, cfg = cfg }
 end
 
+---@param last_runner Runner
+---@param output Output
+---@return Runner
+function M.from_last(last_runner, output, config)
+  local files = {}
+
+  if last_runner.cfg.scope == "nearest" then
+    files = vim.tbl_map(function(example)
+      return example.id
+    end, output.examples)
+  else
+    files = last_runner.cfg.files
+  end
+
+  local cfg = {
+    cwd = last_runner.cfg.cwd,
+    filename = last_runner.cfg.cwd,
+    line = last_runner.cfg.line,
+    examples = {},
+    scope = "last",
+    files = files
+  }
+
+  local cmd = M.build_cmd(cfg, config)
+
+  return { cmd = cmd, cfg = cfg }
+end
+
 ---@return string[]
 function M.find_nearest()
   local lang = "ruby"
@@ -87,10 +115,10 @@ function M.build_cmd(runner_cfg, config)
   local cmd = config.cmd
   local args = { "--format", "j" }
 
-  if runner_cfg.scope == "file" then
-    vim.list_extend(args, runner_cfg.files)
+  if runner_cfg.scope == "all" then
     vim.list_extend(cmd, args)
   else
+    vim.list_extend(args, runner_cfg.files)
     vim.list_extend(cmd, args)
   end
 
