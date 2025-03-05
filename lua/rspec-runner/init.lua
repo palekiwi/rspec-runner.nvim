@@ -30,6 +30,7 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerAll", function() M.run("all") end, {})
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})
   vim.api.nvim_create_user_command("RspecRunnerResults", function() M.browse(M.state, M.config) end, {})
 end
 

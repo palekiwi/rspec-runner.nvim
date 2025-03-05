@@ -1,10 +1,9 @@
 local rspec_query = require "rspec-runner.query"
-local utils = require "rspec-runner.utils"
 
 local ts = vim.treesitter
 local parsers = require "nvim-treesitter.parsers"
 
----@alias Runner.Scope "all" | "file" | "last"
+---@alias Runner.Scope "all" | "file" | "last" | "nearest"
 
 ---@class Runner.Opts
 ---@field cwd? string
@@ -49,6 +48,11 @@ function M.new(scope, config, opts)
     else
       cfg.files = { spec }
     end
+  elseif scope == "nearest" then
+    assert(M.is_specfile(cfg.filename), "Not a specfile.")
+    local line = M.find_nearest()
+    assert(line, "No test block found.")
+    cfg.files = { string.format("%s:%s", cfg.filename, line)}
   end
 
   local cmd = M.build_cmd(cfg, config)
@@ -84,10 +88,10 @@ function M.from_last(last_runner, output, config)
   return { cmd = cmd, cfg = cfg }
 end
 
----@return string[]
+---@return number?
 function M.find_nearest()
   local lang = "ruby"
-  local examples = {}
+  local line = nil
 
   parsers.get_parser(0, lang)
   local query = ts.query.parse(lang, rspec_query)
@@ -97,23 +101,23 @@ function M.find_nearest()
   while curnode do
     for id, capture_node in query:iter_captures(curnode, 0) do
       if query.captures[id] == "test_name" then
-        table.insert(examples, 1, ts.get_node_text(capture_node, 0))
-        return examples
+        line = capture_node:range() + 1
+        return line
       end
     end
 
     curnode = curnode:parent()
   end
 
-  return examples
+  return line
 end
 
 ---@param runner_cfg Runner.Config
 ---@param config Config
 ---@return string[]
 function M.build_cmd(runner_cfg, config)
-  local cmd = config.cmd
-  local args = { "--format", "j" }
+  local cmd = vim.deepcopy(config.cmd)
+  local args = vim.deepcopy({ "--format", "j" })
 
   if runner_cfg.scope == "all" then
     vim.list_extend(cmd, args)
@@ -127,14 +131,14 @@ end
 
 ---@param filepath string
 ---@return boolean
-local function is_specfile(filepath)
+function M.is_specfile(filepath)
   return string.match(filepath, "_spec%.rb$") ~= nil
 end
 
 ---@param filepath string
 ---@return string?
 function M.spec_for(filepath)
-  if is_specfile(filepath) then
+  if M.is_specfile(filepath) then
     return filepath
   else
     local root, dirname, filename = string.match(filepath, "([^%/]+)/(.*)/([^%/]+).rb$")
