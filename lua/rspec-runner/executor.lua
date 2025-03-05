@@ -27,7 +27,10 @@ function M.execute(runner, config, state)
 
   local function on_exit()
     if #state.output.examples == 0 then
-      print("Error: no examples")
+      vim.notify("No examples.", vim.log.levels.ERROR, {
+        replace = notification,
+        title = "[RspecRunner]"
+      })
       return
     end
 
