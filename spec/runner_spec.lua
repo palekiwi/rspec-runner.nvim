@@ -1,4 +1,4 @@
-local helpers = require("spec.helpers")
+local helpers = require("spec.spec_helpers")
 local Runner = require("rspec-runner.runner")
 
 local specfile = "spec/fixtures/adder_spec.rb"
