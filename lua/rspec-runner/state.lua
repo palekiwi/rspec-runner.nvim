@@ -1,6 +1,7 @@
 ---@class State
 ---@field output? Output
 ---@field runner? Runner
+---@field job? vim.SystemObj
 
 local M = {}
 

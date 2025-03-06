@@ -1,4 +1,5 @@
 local output = require("rspec-runner.output")
+local Notifier = require("rspec-runner.notifier")
 
 local M = {}
 
@@ -8,29 +9,39 @@ local M = {}
 function M.execute(runner, config, state)
   local ns = config.namespace
 
-  local notification = vim.notify(string.format("Running in scope: %s...", runner.cfg.scope))
+  local notifier = Notifier.new(config)
+
+  notifier:run_start(runner.cfg.scope)
 
   local function on_stdout(err, data)
     if err then
-      print("An error has occurred: %s", err)
+      notifier:error("An error has occurred:\n" ..err)
       return
     end
 
     if data then
-      local valid_output = output.parse(data)
+      local ok, valid_output = pcall(output.parse, data)
 
-      if valid_output then
+      if not ok then
+        notifier:error("A parsing error has occurred.")
+      elseif valid_output ~= nil then
         state.output = valid_output
       end
     end
   end
 
   local function on_exit()
+    -- check if the run has been cancelled
+    if state.job:is_closing() then
+      local status = state.job:wait()
+      if status.code > 2 then
+        notifier:run_cancelled()
+        return
+      end
+    end
+
     if #state.output.examples == 0 then
-      vim.notify("No examples.", vim.log.levels.ERROR, {
-        replace = notification,
-        title = "[RspecRunner]"
-      })
+      notifier:error("No examples")
       return
     end
 
@@ -67,29 +78,21 @@ function M.execute(runner, config, state)
     end
 
     if vim.tbl_isempty(failed) then
-      local summary = state.output.summary
-      local successful = tonumber(summary.example_count) - tonumber(summary.failure_count) - tonumber(summary.pending_count)
-
-      vim.notify(successful .. " passed", vim.log.levels.DEBUG, {
-        replace = notification,
-        title = "[RspecRunner]"
-      })
+      notifier:run_passed(state.output.summary)
     else
-      local body = table.concat({
-        state.output.summary.failure_count .. " failures",
-      }, "\n")
-      vim.notify(body, vim.log.levels.ERROR, {
-        replace = notification,
-        title = "[RspecRunner]"
-      })
+      notifier:run_failed(state.output.summary)
     end
   end
 
-  return vim.system(
+  local job = vim.system(
     runner.cmd,
     { stdout = on_stdout },
     function() vim.schedule(on_exit) end
   )
+
+  state.job = job
+
+  return job
 end
 
 return M

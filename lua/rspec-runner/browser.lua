@@ -15,6 +15,34 @@ local Previewer = require("rspec-runner.previewer")
 
 local M = {}
 
+---@param items string[]
+---@return table
+function M.diagnostics_from_backtrace(items)
+  local result = {}
+  for _, item in pairs(items) do
+    local filepath, line = string.match(item, "([^:]+):([^:]+):.*")
+
+    if filepath and line then
+      local bufnr = vim.fn.bufnr(filepath, true)
+
+      local entry = {
+        bufnr = bufnr,
+        lnum = tonumber(line) - 1,
+        col = 1,
+        severity = vim.diagnostic.severity.ERROR,
+        source = "rspec-runner",
+        message = filepath .. ":" .. line,
+        user_data = {},
+      }
+
+      result[bufnr] = result[bufnr] or {}
+      table.insert(result[bufnr], entry)
+    end
+  end
+
+  return result
+end
+
 ---@param examples Output.Example[]
 ---@param config Config
 function M.browse(examples, config)
@@ -61,30 +89,9 @@ function M.browse(examples, config)
 
         actions.close(prompt_bufnr)
 
-        local backtrace = {}
-
-        for _, item in pairs(ex.exception.backtrace) do
-          local file_path, line = string.match(item, "([^:]+):([^:]+):.*")
-          local bufnr = vim.fn.bufnr(file_path, true)
-
-          local entry = {
-            bufnr = bufnr,
-            lnum = tonumber(line) - 1,
-            col = 1,
-            severity = vim.diagnostic.severity.ERROR,
-            source = "rspec-runner",
-            message = "[RspecRunner] Backtrace: " .. ex.description,
-            user_data = {},
-          }
-
-          backtrace[bufnr] = backtrace[bufnr] or {}
-          table.insert(backtrace[bufnr], entry)
-        end
-
-        for bufnr, entries in pairs(backtrace) do
+        for bufnr, entries in pairs(M.diagnostics_from_backtrace(ex.exception.backtrace)) do
           vim.diagnostic.set(ns, bufnr, entries, {})
         end
-
 
         vim.diagnostic.setqflist({ open = true, namespace = ns, title = "[RspecRunner] Backtrace" })
       end, { desc = "Send backtrace qflist" })

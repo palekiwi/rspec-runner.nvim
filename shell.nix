@@ -9,6 +9,7 @@ pkgs.mkShell {
       luajitPackages.nlua
       luajitPackages.nui-nvim
 
+      vimPlugins.plenary-nvim
       vimPlugins.telescope-nvim
       vimPlugins.nvim-treesitter
       vimPlugins.nvim-treesitter-parsers.ruby

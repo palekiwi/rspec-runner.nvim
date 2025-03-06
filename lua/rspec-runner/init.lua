@@ -1,11 +1,53 @@
 local Runner = require("rspec-runner.runner")
 local Executor = require("rspec-runner.executor")
 local Browser = require("rspec-runner.browser")
+local Notifier = require("rspec-runner.notifier")
 
 local M = {
   config = vim.deepcopy(require "rspec-runner.config"),
   state = require("rspec-runner.state").new()
 }
+
+---@param scope Runner.Scope
+function M.run(scope)
+  local runner
+  local notifier = Notifier.new(M.config)
+
+  if M.state.job and not M.state.job:is_closing() then
+    notifier:warn("Job already in progress.")
+    return M.state.job
+  end
+
+  if scope == "last" then
+    assert(M.state.output, "No previous output found")
+    assert(M.state.runner, "No previous runner found")
+
+    runner = Runner.from_last(M.state.runner, M.state.output, M.config)
+  else
+    runner = Runner.new(scope, M.config, {})
+  end
+
+  M.state.runner = runner
+
+  return Executor.execute(runner, M.config, M.state)
+end
+
+---@param state State
+function M.cancel_run(state)
+  local job = state.job
+  if job == nil then
+    return
+  else
+    job:kill(2)
+  end
+end
+
+---@param state State
+---@param config Config
+function M.browse(state, config)
+  assert(state.output, "No runner output available.")
+  Browser.browse(state.output.examples, config)
+end
 
 ---@param cfg UserConfig
 function M.setup(cfg)
@@ -31,31 +73,8 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
   vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerCancel", function() M.cancel_run(M.state) end, {})
   vim.api.nvim_create_user_command("RspecRunnerResults", function() M.browse(M.state, M.config) end, {})
-end
-
----@param scope Runner.Scope
-function M.run(scope)
-  local runner
-
-  if scope == "last" then
-    assert(M.state.output, "No previous output found")
-    assert(M.state.runner, "No previous runner found")
-
-    runner = Runner.from_last(M.state.runner, M.state.output, M.config)
-  else
-    runner = Runner.new(scope, M.config, {})
-  end
-
-  M.state.runner = runner
-  return Executor.execute(runner, M.config, M.state)
-end
-
----@param state State
----@param config Config
-function M.browse(state, config)
-  assert(state.output, "No runner output available.")
-  Browser.browse(state.output.examples, config)
 end
 
 return M

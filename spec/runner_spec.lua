@@ -27,7 +27,7 @@ describe("Runner", function()
         local runner = Runner.new("all", config)
 
         assert.equal(vim.fn.getcwd(), runner.cfg.cwd)
-        assert.equal(specfile, runner.cfg.filename)
+        assert.equal("./spec/fixtures/adder_spec.rb", runner.cfg.filename)
         assert.equal(1, runner.cfg.line)
         assert.equal("all", runner.cfg.scope)
         assert.are.same({ "rspec", "--format", "j" }, runner.cmd)
@@ -43,7 +43,7 @@ describe("Runner", function()
           local runner = Runner.new("file", config)
 
           assert.equal("file", runner.cfg.scope)
-          assert.are.same({ "rspec", "--format", "j", specfile }, runner.cmd)
+          assert.are.same({ "rspec", "--format", "j", "./spec/fixtures/adder_spec.rb" }, runner.cmd)
         end)
       end)
 

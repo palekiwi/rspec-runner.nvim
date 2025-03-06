@@ -1,13 +1,15 @@
+local helpers = require("spec.spec_helpers")
+
 local Runner = require("rspec-runner.runner")
 local Executor = require("rspec-runner.executor")
-local config = require("rspec-runner.config")
 local State = require("rspec-runner.state")
 
 describe("Executor", function()
   describe("#execute", function()
     it("executes a runner", function()
-      local runner = Runner.new("all", config)
+      local runner = Runner.new("all", helpers.build_config())
       local state = State.new()
+      local config = helpers.build_config()
 
       Executor.execute(runner, config, state):wait()
 
