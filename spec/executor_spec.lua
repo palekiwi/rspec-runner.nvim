@@ -7,7 +7,7 @@ local State = require("rspec-runner.state")
 describe("Executor", function()
   describe("#execute", function()
     it("executes a runner", function()
-      local runner = Runner.new("all", helpers.build_config())
+      local _, runner = Runner.new("all", helpers.build_config())
       local state = State.new()
       local config = helpers.build_config()
 

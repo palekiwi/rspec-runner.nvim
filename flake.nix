@@ -17,7 +17,7 @@
       {
         devShells = rec {
           default = test-shell;
-          test-shell = import ./default.nix { inherit pkgs; };
+          test-shell = import ./shell.nix { inherit pkgs; };
         };
       }
     );

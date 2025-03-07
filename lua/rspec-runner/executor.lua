@@ -11,7 +11,7 @@ function M.execute(runner, config, state)
 
   local notifier = Notifier.new(config)
 
-  notifier:run_start(runner.cfg.scope)
+  notifier:run_start(runner.scope)
 
   local function on_stdout(err, data)
     if err then

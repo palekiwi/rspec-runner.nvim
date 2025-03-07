@@ -41,7 +41,7 @@ function Notifier:notify(msg, level, opts)
   end
 end
 
----@param scope Runner.Scope
+---@param scope Scope
 function Notifier:run_start(scope)
   self:notify(
     string.format("Running in %s scope...", scope:upper()),

@@ -8,8 +8,11 @@ local M = {
   state = require("rspec-runner.state").new()
 }
 
----@param scope Runner.Scope
+---@alias Scope "all" | "file" | "last" | "nearest"
+
+---@param scope Scope
 function M.run(scope)
+  local err
   local runner
   local notifier = Notifier.new(M.config)
 
@@ -26,7 +29,11 @@ function M.run(scope)
 
     runner = Runner.from_last(M.state.runner, M.state.output, M.config)
   else
-    runner = Runner.new(scope, M.config, {})
+    err, runner = Runner.new(scope, M.config)
+    if err then
+      notifier:error(err)
+      return
+    end
   end
 
   M.state.runner = runner
