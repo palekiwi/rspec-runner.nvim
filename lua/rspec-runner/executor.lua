@@ -20,7 +20,7 @@ function M.execute(runner, config, state)
     end
 
     if data then
-      local ok, valid_output = pcall(output.parse, data)
+      local ok, valid_output = pcall(output.parse_json, data)
 
       if not ok then
         notifier:error("A parsing error has occurred.")

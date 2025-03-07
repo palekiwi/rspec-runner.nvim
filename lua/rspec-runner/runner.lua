@@ -117,11 +117,12 @@ end
 ---@return string[]
 function M.build_cmd(runner_cfg, config)
   local cmd = vim.deepcopy(config.cmd)
-  local args = vim.deepcopy({ "--format", "j" })
 
   if runner_cfg.scope == "all" then
+    local args = { "--format", "f" , "--fail-fast" }
     vim.list_extend(cmd, args)
   else
+    local args = vim.deepcopy({ "--format", "j" })
     vim.list_extend(args, runner_cfg.files)
     vim.list_extend(cmd, args)
   end

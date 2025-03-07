@@ -35,7 +35,7 @@ end
 
 ---@param data string
 ---@return Output | nil
-function M.parse(data)
+function M.parse_json(data)
   local json_str = match_json(data)
 
   if not json_str then return end
@@ -43,6 +43,26 @@ function M.parse(data)
   --TODO: add validation with `vim.validate`
 
   return vim.json.decode(json_str)
+end
+
+---@param data string
+---@return Output | nil
+function M.parse_failures(data)
+  local file, line, reason = string.match(data, "([^:]+):([^:]+):(.*)")
+  if not file or not line then
+    return
+  end
+
+  return {
+    id = nil,
+    description = reason,
+    full_description = reason,
+    status = "failed",
+    file_path = file,
+    line_number = line,
+    run_time = 0,
+    pending_message = vim.NIL
+  }
 end
 
 return M

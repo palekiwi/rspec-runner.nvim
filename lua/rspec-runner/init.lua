@@ -14,13 +14,15 @@ function M.run(scope)
   local notifier = Notifier.new(M.config)
 
   if M.state.job and not M.state.job:is_closing() then
-    notifier:warn("Job already in progress.")
+    notifier:run_in_progress()
     return M.state.job
   end
 
   if scope == "last" then
-    assert(M.state.output, "No previous output found")
-    assert(M.state.runner, "No previous runner found")
+    if M.state.output == nil or M.state.runner == nil then
+      notifier:error("No previous runs.")
+      return
+    end
 
     runner = Runner.from_last(M.state.runner, M.state.output, M.config)
   else
@@ -45,8 +47,11 @@ end
 ---@param state State
 ---@param config Config
 function M.browse(state, config)
-  assert(state.output, "No runner output available.")
-  Browser.browse(state.output.examples, config)
+  if M.state.output == nil then
+    Notifier.new(config):error("No previous runs.")
+  else
+    Browser.browse(state.output.examples, config)
+  end
 end
 
 ---@param cfg UserConfig
