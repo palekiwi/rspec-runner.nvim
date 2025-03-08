@@ -13,6 +13,21 @@ function M.view_file(path, line)
   vim.api.nvim_command(cmd)
 end
 
+---@param filepath string
+---@return string
+function M.read_file(filepath)
+  local file = io.open(filepath, "r")
+
+  if not file then
+    error("Error reading file.")
+  else
+    io.input(file)
+    local result = io.read("*a")
+    file:close()
+    return result
+  end
+end
+
 ---@return Config
 function M.build_config()
   return {

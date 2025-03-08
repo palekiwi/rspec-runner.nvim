@@ -1,5 +1,5 @@
-local output = require("rspec-runner.output")
 local Notifier = require("rspec-runner.notifier")
+local Decoder = require("rspec-runner.decoder")
 
 local M = {}
 
@@ -11,6 +11,8 @@ function M.execute(runner, config, state)
 
   local notifier = Notifier.new(config)
 
+  local output = ""
+  local examples = {}
   notifier:run_start(runner.scope)
 
   local function on_stdout(err, data)
@@ -19,14 +21,19 @@ function M.execute(runner, config, state)
       return
     end
 
-    if data then
-      local ok, valid_output = pcall(output.parse_json, data)
+    -- local result
 
-      if not ok then
-        notifier:error("A parsing error has occurred.")
-      elseif valid_output ~= nil then
-        state.output = valid_output
-      end
+    -- if data then
+    --   err, result = Decoder.decode(data)
+
+    --   if err then
+    --     notifier:error("A parsing error has occurred.")
+    --   else
+    --     vim.list_extend(examples, result)
+    --   end
+    -- end
+    if data then
+      output = output .. data
     end
   end
 
@@ -40,23 +47,31 @@ function M.execute(runner, config, state)
       end
     end
 
-    if #state.output.examples == 0 then
+    local err, result = Decoder.decode(output)
+
+    if err then
+      notifier:error("A parsing error has occurred.")
+    else
+      vim.list_extend(examples, result)
+    end
+
+    if #examples == 0 then
       notifier:error("No examples")
       return
     end
 
     local failed = {}
+    local passed_count = 0
+    local failed_count = 0
 
     vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
+    vim.diagnostic.reset(ns)
 
-    for _, example in ipairs(state.output.examples) do
+    for _, example in ipairs(examples) do
       local bufnr = vim.fn.bufnr(example.file_path, true)
 
-      if config.diagnostics then
-        vim.diagnostic.reset(ns)
-      end
-
       if example.status == "failed" then
+        failed_count = failed_count + 1
         failed[bufnr] = failed[bufnr] or {}
 
         table.insert(failed[bufnr], {
@@ -68,6 +83,8 @@ function M.execute(runner, config, state)
           message = example.exception.message,
           user_data = {},
         })
+      elseif example.status == "passed" then
+        passed_count = passed_count + 1
       end
     end
 
@@ -78,9 +95,9 @@ function M.execute(runner, config, state)
     end
 
     if vim.tbl_isempty(failed) then
-      notifier:run_passed(state.output.summary)
+      notifier:run_passed(passed_count)
     else
-      notifier:run_failed(state.output.summary)
+      notifier:run_failed(failed_count)
     end
   end
 
@@ -90,6 +107,7 @@ function M.execute(runner, config, state)
     function() vim.schedule(on_exit) end
   )
 
+  state.output.examples = examples
   state.job = job
 
   return job

@@ -50,25 +50,14 @@ function Notifier:run_start(scope)
   )
 end
 
----@param summary Output.Summary
-function Notifier:run_passed(summary)
-  local msg
-  local total = tonumber(summary.example_count)
-  local pending = tonumber(summary.pending_count)
-
-  if pending > 0 then
-    msg = string.format("%s passed, %s pending", total - pending, pending)
-  else
-    msg = string.format("%s passed", total)
-  end
-
-  self:notify(msg, vim.log.levels.DEBUG)
+---@param count number
+function Notifier:run_passed(count)
+  self:notify(count .. " examples passed.", vim.log.levels.DEBUG)
 end
 
----@param summary Output.Summary
-function Notifier:run_failed(summary)
-  local msg = summary.failure_count .. " examples failed."
-  self:notify(msg, vim.log.levels.ERROR)
+---@param count number
+function Notifier:run_failed(count)
+  self:notify(count .. " examples failed.", vim.log.levels.ERROR)
 end
 
 ---@param msg string

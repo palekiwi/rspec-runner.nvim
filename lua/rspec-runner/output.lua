@@ -1,8 +1,5 @@
 ---@class Output
----@field version string
 ---@field examples Output.Example[]
----@field summary Output.Summary
----@field summary_line string
 
 ---@class Output.Example
 ---@field id string
@@ -18,13 +15,6 @@
 ---@field class string
 ---@field message string
 ---@field backtrace string[]
-
----@class Output.Summary
----@field duration number
----@field example_count number
----@field failure_count number
----@field pending_count number
----@field errors_outside_of_examples_count number
 
 local M = {}
 
