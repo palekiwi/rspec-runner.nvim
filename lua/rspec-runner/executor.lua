@@ -21,17 +21,6 @@ function M.execute(runner, config, state)
       return
     end
 
-    -- local result
-
-    -- if data then
-    --   err, result = Decoder.decode(data)
-
-    --   if err then
-    --     notifier:error("A parsing error has occurred.")
-    --   else
-    --     vim.list_extend(examples, result)
-    --   end
-    -- end
     if data then
       output = output .. data
     end
