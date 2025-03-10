@@ -78,10 +78,8 @@ function M.execute(runner, config, state)
       end
     end
 
-    if config.diagnostics then
-      for bufnr, entries in pairs(failed) do
-        vim.diagnostic.set(ns, bufnr, entries, {})
-      end
+    for bufnr, entries in pairs(failed) do
+      vim.diagnostic.set(ns, bufnr, entries, {})
     end
 
     if vim.tbl_isempty(failed) then
