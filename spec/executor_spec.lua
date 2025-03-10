@@ -11,14 +11,16 @@ describe("Executor", function()
       local state = State.new()
       local config = helpers.build_config()
 
-      Executor.execute(runner, config, state):wait()
+      vim.wait(200, function()
+        return Executor.execute(runner, config, state):is_closing()
+      end)
 
       local output = state.output
 
       assert(output)
-      assert(#output.examples, 3)
-      assert.equal(3, output.summary.example_count)
-      assert.equal(2, output.summary.failure_count)
+      assert.equal(#output.examples, 3)
+      assert.equal(1, output.passed_count)
+      assert.equal(2, output.failed_count)
     end)
   end)
 end)

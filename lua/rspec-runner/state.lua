@@ -9,7 +9,9 @@ local M = {}
 function M.new()
   return {
     output = {
-      examples = {}
+      examples = {},
+      passed_count = 0,
+      failed_count = 0,
     }
   }
 end

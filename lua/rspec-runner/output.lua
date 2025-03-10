@@ -1,5 +1,7 @@
 ---@class Output
 ---@field examples Output.Example[]
+---@field passed_count number
+---@field failed_count number
 
 ---@class Output.Example
 ---@field id string

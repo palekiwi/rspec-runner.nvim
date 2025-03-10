@@ -13,6 +13,9 @@ function M.execute(runner, config, state)
 
   local output = ""
   local examples = {}
+  local passed_count = 0
+  local failed_count = 0
+
   notifier:run_start(runner.scope, #runner.files)
 
   local function on_stdout(err, data)
@@ -50,8 +53,6 @@ function M.execute(runner, config, state)
     end
 
     local failed = {}
-    local passed_count = 0
-    local failed_count = 0
 
     vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
     vim.diagnostic.reset(ns)
@@ -88,6 +89,10 @@ function M.execute(runner, config, state)
     else
       notifier:run_failed(failed_count)
     end
+
+    state.output.examples = examples
+    state.output.passed_count = passed_count
+    state.output.failed_count = failed_count
   end
 
   local job = vim.system(
@@ -95,8 +100,6 @@ function M.execute(runner, config, state)
     { stdout = on_stdout },
     function() vim.schedule(on_exit) end
   )
-
-  state.output.examples = examples
   state.job = job
 
   return job
