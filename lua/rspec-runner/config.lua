@@ -24,8 +24,7 @@
 local Config = {
   namespace = vim.api.nvim_create_namespace("rspec-runner"),
   cmd = { "rspec" },
-  diagnostics = true,
-  notify = true,
+  notify = false,
 }
 
 return Config

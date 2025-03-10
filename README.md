@@ -27,7 +27,8 @@ return {
     config = function()
       require 'rspec-runner'.setup({
         defaults =  {
-            cmd = { "bundle", "exec", "rspec" }, -- command that executes rspec
+          notify = false, -- set to `true` if using a notification plugin, such as `rcarriga/nvim-notify`
+          cmd = { "bundle", "exec", "rspec" }, -- command that executes rspec
         },
         projects = { -- per project settings
           {
