@@ -15,7 +15,7 @@ Runs rspec inside nvim and collects results for convenient browsing of results a
 
 `RspecRunnerCancel` cancels current run
 
-`RspecRunnerShowResults` displays results in a telescope window, requires telescope. Use `<C-d>` and `<C-d>` to scroll preview down/up. `<C-q>` over an entry populates quickfix list with the backtrace of a failed test.
+`RspecRunnerShowResults` displays results in a telescope window, requires telescope. Use `<C-d>` and `<C-u>` to scroll preview down/up. `<C-q>` over an entry populates quickfix list with the backtrace of a failed test.
 
 ## Setup
 Recommended minimal setup:
