@@ -8,7 +8,7 @@ local M = {
   state = require("rspec-runner.state").new()
 }
 
----@alias Scope "all" | "file" | "last" | "nearest"
+---@alias Scope "all" | "base" | "file" | "last" | "nearest" |
 
 ---@param scope Scope
 function M.run(scope)
@@ -82,11 +82,12 @@ function M.setup(cfg)
   end
 
   vim.api.nvim_create_user_command("RspecRunnerAll", function() M.run("all") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerBase", function() M.run("base") end, {})
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
   vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})
   vim.api.nvim_create_user_command("RspecRunnerCancel", function() M.cancel_run(M.state) end, {})
-  vim.api.nvim_create_user_command("RspecRunnerResults", function() M.browse(M.state, M.config) end, {})
+  vim.api.nvim_create_user_command("RspecRunnerShowResults", function() M.browse(M.state, M.config) end, {})
 end
 
 return M

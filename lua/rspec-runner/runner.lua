@@ -40,6 +40,17 @@ function M.new(scope, config)
     end
 
     files = { string.format("%s:%s", env.filename, line)}
+  elseif scope == "base" then
+    local base = "master"
+
+    if config.git_base then
+      base = config.git_base() or base
+    end
+
+    files = M.specs_for_base(base)
+    if (#files) == 0 then
+      return "No specs found in scope BASE for: " .. base, runner
+    end
   end
 
   local cmd = M.build_cmd(scope, files, config)
@@ -145,6 +156,39 @@ function M.spec_for(filepath)
 
     return nil
   end
+end
+
+---@param base string branch name or commit hash
+---@return string[]
+function M.changed_files(base)
+  local command = "git diff --name-only $(git merge-base HEAD " .. base .. " )"
+
+  local handle = assert(io.popen(command))
+  local result = handle:read("*a")
+  handle:close()
+
+  local files = {}
+
+  for token in string.gmatch(result, "[^%s]+") do
+    table.insert(files, token)
+  end
+
+  return files
+end
+
+---@param base string branch name or commit hash
+function M.specs_for_base(base)
+  local set = {}
+
+  for _, el in ipairs(M.changed_files(base)) do
+    local spec = M.spec_for(el)
+
+    if spec then
+      set[spec] = true
+    end
+  end
+
+  return vim.tbl_keys(set)
 end
 
 return M

@@ -4,6 +4,7 @@
 ---@field diagnostics boolean
 ---@field notify boolean
 ---@field spec_patterns string[]
+---@field git_base? fun(): string?
 
 ---@class UserConfig
 ---@field defaults? UserConfig.Defaults
