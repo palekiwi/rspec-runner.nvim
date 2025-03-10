@@ -12,11 +12,13 @@ function M.execute(runner, config, state)
   local notifier = Notifier.new(config)
 
   local output = ""
+  local errors = {}
   local examples = {}
   local passed_count = 0
   local failed_count = 0
 
   notifier:run_start(runner.scope, #runner.files)
+  print(string.format("[RspecRunner][INFO]: Running in %s scope", runner.scope:upper()))
 
   local function on_stdout(err, data)
     if err then
@@ -29,7 +31,24 @@ function M.execute(runner, config, state)
     end
   end
 
+  local function on_stderr(err, data)
+    if err then
+      notifier:error("An error has occurred:\n" ..err)
+      return
+    elseif data then
+      table.insert(errors, data)
+    end
+  end
+
   local function on_exit()
+    if #errors > 0 then
+      print("[RspecRunner][DEBUG]: Run with command: `" .. vim.fn.join(runner.cmd, " ") .. "`")
+      for _, line in pairs(errors) do
+        print("[RspecRunner][ERROR]: " .. line)
+      end
+      print(string.format("[RspecRunner][ERROR]: %s errors.", #errors))
+    end
+
     -- check if the run has been cancelled
     if state.job:is_closing() then
       local status = state.job:wait()
@@ -48,7 +67,7 @@ function M.execute(runner, config, state)
     end
 
     if #examples == 0 then
-      notifier:error("No examples")
+      notifier:error("No examples found. Check messages for details.")
       return
     end
 
@@ -84,18 +103,21 @@ function M.execute(runner, config, state)
 
     if vim.tbl_isempty(failed) then
       notifier:run_passed(passed_count)
+      print(string.format("[RspecRunner][INFO]: %s examples passed.", passed_count))
     else
       notifier:run_failed(failed_count)
+      print(string.format("[RspecRunner][INFO]: %s examples failed.", failed_count))
     end
 
     state.output.examples = examples
+    state.errors = errors
     state.output.passed_count = passed_count
     state.output.failed_count = failed_count
   end
 
   local job = vim.system(
     runner.cmd,
-    { stdout = on_stdout },
+    { stdout = on_stdout, stderr = on_stderr },
     function() vim.schedule(on_exit) end
   )
   state.job = job
