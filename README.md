@@ -32,7 +32,7 @@ return {
         projects = { -- per project settings
           {
             path = "/home/user/code/some-namespace/.*", -- path to a project, must be a lua pattern
-            cmd = { "docker-compose", "exec", "-it", "test", "bin/rspec" }, -- command
+            cmd = { "docker-compose", "exec", "-it", "test", "bundle", "exec", "rspec" }, -- command
           }
         }
       })
