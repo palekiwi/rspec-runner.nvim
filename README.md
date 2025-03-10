@@ -4,11 +4,17 @@ Runs rspec inside nvim and collects results for convenient browsing of results a
 
 ## Available commands
 `RspecRunnerAll`  runs all test in the project
+
 `RspecRunnerBase` runs tests for files that changed since the `base` commit/branch, defaults to "master"
+
 `RspecRunnerFile` runs tests for current file if a specfile exists
+
 `RspecRunnerLast` re-runs with the last settings
+
 `RspecRunnerNearest` runs tests for `it`, `context`, `describe` nearest to cursor
+
 `RspecRunnerCancel` cancels current run
+
 `RspecRunnerShowResults` displays results in a telescope window, requires telescope. `<C-q>` over an entry populates quickfix list with the backtrace of a failed test
 
 ## Setup
