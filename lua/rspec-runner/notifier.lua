@@ -45,7 +45,7 @@ end
 ---@param count? number number of files being tested
 function Notifier:run_start(scope, count)
   local msg
-  if count and count > 0 then
+  if count and count > 1 then
     msg = string.format("Running for %s files in %s scope...", count, scope:upper())
   else
     msg = string.format("Running in %s scope...", scope:upper())

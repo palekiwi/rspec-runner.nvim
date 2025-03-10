@@ -25,7 +25,7 @@ function M.new(scope, config)
     local spec = M.spec_for(env.filename)
 
     if not spec then
-      return "No spec file for the current file: " .. env.filename, runner
+      return "No spec file for current file.", runner
     end
 
     files = { spec }
