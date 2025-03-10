@@ -42,9 +42,17 @@ function Notifier:notify(msg, level, opts)
 end
 
 ---@param scope Scope
-function Notifier:run_start(scope)
+---@param count? number number of files being tested
+function Notifier:run_start(scope, count)
+  local msg
+  if count then
+    msg = string.format("Running for %s files in %s scope...", count, scope:upper())
+  else
+    msg = string.format("Running in %s scope...", scope:upper())
+  end
+
   self:notify(
-    string.format("Running in %s scope...", scope:upper()),
+    msg,
     vim.log.levels.INFO,
     { timeout = false }
   )

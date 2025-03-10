@@ -13,7 +13,7 @@ function M.execute(runner, config, state)
 
   local output = ""
   local examples = {}
-  notifier:run_start(runner.scope)
+  notifier:run_start(runner.scope, #runner.files)
 
   local function on_stdout(err, data)
     if err then
