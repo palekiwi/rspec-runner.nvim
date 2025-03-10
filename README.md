@@ -40,3 +40,23 @@ return {
   }
 }
 ```
+The `cmd` can be either a `string[]` or `fun(rspec_args: string[], files: string[]): string[]`.
+If the project uses a wrapper around `rspec`, you can construct the command by passing a function, for example:
+
+```lua
+...
+  projects = {
+    {
+      path = "/home/user/code/my-project",
+      cmd = function(rspec_flags, files)
+        local args = vim.list_extend(rspec_flags, files)
+
+        return vim.list_extend(
+          { "docker-compose", "exec", "-it", "test", "bundle", "exec", "rspec" },
+          args
+        )
+      end,
+    }
+  },
+...
+```

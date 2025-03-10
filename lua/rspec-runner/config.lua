@@ -1,6 +1,8 @@
+---@alias Config.Command string[] | fun(rspec_args: string[], files: string[]): string[]
+
 ---@class Config
 ---@field namespace number
----@field cmd string[]
+---@field cmd Config.Command
 ---@field notify boolean
 ---@field git_base? fun(): string?
 
@@ -10,11 +12,11 @@
 
 ---@class UserConfig.Project
 ---@field path string
----@field cmd? string[]
+---@field cmd? Config.Command
 ---@field notify? boolean
 
 ---@class UserConfig.Defaults
----@field cmd? string[]
+---@field cmd? Config.Command
 ---@field diagnostics? boolean
 ---@field notify? boolean
 

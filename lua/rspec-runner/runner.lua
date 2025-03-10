@@ -53,7 +53,7 @@ function M.new(scope, config)
     end
   end
 
-  local cmd = M.build_cmd(scope, files, config)
+  local cmd = M.build_cmd(files, config)
 
   runner = {
     cmd = cmd,
@@ -88,7 +88,7 @@ function M.from_last(last_runner, output, config)
     env = env,
     scope = scope,
     files = files,
-    cmd = M.build_cmd(scope, files, config)
+    cmd = M.build_cmd(files, config)
   }
 end
 
@@ -116,17 +116,21 @@ function M.find_nearest()
   return line
 end
 
----@param scope Scope
 ---@param files string[]
 ---@param config Config
 ---@return string[]
-function M.build_cmd(scope, files, config)
-  if scope == "all" then
-    return utils.concat(config.cmd, { "--format", "j"})
+function M.build_cmd(files, config)
+  local opts = { "--format", "j"}
+  local cmd
+
+  if type(config.cmd) == "function" then
+    cmd = config.cmd(vim.deepcopy(opts), vim.deepcopy(files))
   else
-    local args = utils.concat({ "--format", "j" }, files)
-    return utils.concat(config.cmd, args)
+    local args = utils.concat(opts, files)
+    cmd = utils.concat(config.cmd --[[@as table]], args)
   end
+
+  return cmd
 end
 
 ---@param filepath string
