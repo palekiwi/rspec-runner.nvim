@@ -2,6 +2,7 @@ local Runner = require("rspec-runner.runner")
 local Executor = require("rspec-runner.executor")
 local Browser = require("rspec-runner.browser")
 local Notifier = require("rspec-runner.notifier")
+local Terminal = require("rspec-runner.terminal")
 
 local M = {
   config = vim.deepcopy(require "rspec-runner.config"),
@@ -39,6 +40,33 @@ function M.run(scope)
   M.state.runner = runner
 
   return Executor.execute(runner, M.config, M.state)
+end
+---
+---@param scope Scope
+function M.term_run(scope)
+  local err
+  local runner
+  local notifier = Notifier.new(M.config)
+
+  if M.state.job and not M.state.job:is_closing() then
+    notifier:run_in_progress()
+    return M.state.job
+  end
+
+  if scope == "last" then
+    notifier:error("Not supported in term.")
+    return
+  else
+    err, runner = Runner.new(scope, M.config, { term = true })
+    if err then
+      notifier:error(err)
+      return
+    end
+  end
+
+  M.state.runner = runner
+
+  return Terminal.execute(runner)
 end
 
 ---@param state State
@@ -88,6 +116,8 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})
   vim.api.nvim_create_user_command("RspecRunnerCancel", function() M.cancel_run(M.state) end, {})
   vim.api.nvim_create_user_command("RspecRunnerShowResults", function() M.browse(M.state, M.config) end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermFile", function() M.term_run("file") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermNearest", function() M.term_run("nearest") end, {})
 end
 
 return M

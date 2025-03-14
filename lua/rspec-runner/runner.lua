@@ -10,16 +10,20 @@ local parsers = require "nvim-treesitter.parsers"
 ---@field env Env
 ---@field scope Scope
 ---@field files string[]
+---@field opts table
 
 local M = {}
 
 ---@param scope Scope
 ---@param config Config
+---@param opts? table
 ---@return string? error, Runner
-function M.new(scope, config)
+function M.new(scope, config, opts)
   local files = {}
   local runner = {}
   local env = Env.build()
+
+  opts = opts or {}
 
   if scope == "file" then
     local spec = M.spec_for(env.filename)
@@ -53,13 +57,14 @@ function M.new(scope, config)
     end
   end
 
-  local cmd = M.build_cmd(files, config)
+  local cmd = M.build_cmd(files, config, opts)
 
   runner = {
     cmd = cmd,
     env = env,
     scope = scope,
-    files = files
+    files = files,
+    opts = opts,
   }
 
   return nil, runner
@@ -118,15 +123,22 @@ end
 
 ---@param files string[]
 ---@param config Config
+---@param opts? table
 ---@return string[]
-function M.build_cmd(files, config)
-  local opts = { "--format", "j"}
+function M.build_cmd(files, config, opts)
   local cmd
+  local flags
+
+  if opts and opts.term then
+    flags = { "--format", "p" }
+  else
+    flags = { "--format", "j" }
+  end
 
   if type(config.cmd) == "function" then
-    cmd = config.cmd(vim.deepcopy(opts), vim.deepcopy(files))
+    cmd = config.cmd(vim.deepcopy(flags), vim.deepcopy(files))
   else
-    local args = utils.concat(opts, files)
+    local args = utils.concat(flags, files)
     cmd = utils.concat(config.cmd --[[@as table]], args)
   end
 
