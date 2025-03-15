@@ -67,7 +67,7 @@ describe("Runner", function()
 
           local config = build_config()
           local err = Runner.new("file", config)
-          assert.equal("No spec file for the current file: spec/fixtures/multiplier.rb", err)
+          assert.equal("No spec file for current file.", err)
         end)
       end)
     end)
