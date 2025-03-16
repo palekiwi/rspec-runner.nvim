@@ -116,6 +116,8 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})
   vim.api.nvim_create_user_command("RspecRunnerCancel", function() M.cancel_run(M.state) end, {})
   vim.api.nvim_create_user_command("RspecRunnerShowResults", function() M.browse(M.state, M.config) end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermAll", function() M.term_run("all") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermBase", function() M.term_run("base") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermFile", function() M.term_run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermNearest", function() M.term_run("nearest") end, {})
 end

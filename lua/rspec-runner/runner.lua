@@ -130,9 +130,10 @@ function M.build_cmd(files, config, opts)
   local flags
 
   if opts and opts.term then
-    flags = { "--format", "p" }
+    local format = config.flags and config.flags.terminal.format or "documentation"
+    flags = { "--format", format }
   else
-    flags = { "--format", "j" }
+    flags = { "--format", "json" }
   end
 
   if type(config.cmd) == "function" then

@@ -31,7 +31,7 @@ describe("Runner", function()
         assert.equal("./spec/fixtures/adder_spec.rb", runner.env.filename)
         assert.equal(1, runner.env.line)
         assert.equal("all", runner.scope)
-        assert.are.same({ "rspec", "--format", "j" }, runner.cmd)
+        assert.are.same({ "rspec", "--format", "json" }, runner.cmd)
       end)
     end)
 
@@ -45,7 +45,7 @@ describe("Runner", function()
 
           assert.falsy(err)
           assert.equal("file", runner.scope)
-          assert.are.same({ "rspec", "--format", "j", "./spec/fixtures/adder_spec.rb" }, runner.cmd)
+          assert.are.same({ "rspec", "--format", "json", "./spec/fixtures/adder_spec.rb" }, runner.cmd)
         end)
       end)
 
@@ -57,7 +57,7 @@ describe("Runner", function()
           local _, runner = Runner.new("file", config)
 
           assert.equal("file", runner.scope)
-          assert.are.same({ "rspec", "--format", "j", specfile }, runner.cmd)
+          assert.are.same({ "rspec", "--format", "json", specfile }, runner.cmd)
         end)
       end)
 

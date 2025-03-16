@@ -1,5 +1,6 @@
 local M = {}
 
+---@param cmd string
 function M.small_terminal(cmd)
   vim.cmd.new()
   vim.opt.number = false
