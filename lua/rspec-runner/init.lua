@@ -9,7 +9,7 @@ local M = {
   state = require("rspec-runner.state").new()
 }
 
----@alias Scope "all" | "base" | "file" | "last" | "nearest" |
+---@alias Scope "all" | "base" | "failures" | "file" | "last" | "nearest" |
 
 ---@param scope Scope
 function M.run(scope)
@@ -29,6 +29,13 @@ function M.run(scope)
     end
 
     runner = Runner.from_last(M.state.runner, M.state.output, M.config)
+  elseif scope == "failures" then
+    if M.state.output == nil or M.state.output.failed_count == 0 then
+      notifier:error("No previous failures.")
+      return
+    end
+
+    runner = Runner.from_failures(M.state.output, M.config)
   else
     err, runner = Runner.new(scope, M.config)
     if err then
@@ -111,6 +118,7 @@ function M.setup(cfg)
 
   vim.api.nvim_create_user_command("RspecRunnerAll", function() M.run("all") end, {})
   vim.api.nvim_create_user_command("RspecRunnerBase", function() M.run("base") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerFailures", function() M.run("failures") end, {})
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
   vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})

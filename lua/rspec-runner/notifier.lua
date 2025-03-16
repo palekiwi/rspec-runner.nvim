@@ -42,11 +42,19 @@ function Notifier:notify(msg, level, opts)
 end
 
 ---@param scope Scope
----@param count? number number of files being tested
-function Notifier:run_start(scope, count)
+---@param examples? string[]
+function Notifier:run_start(scope, examples)
   local msg
-  if count and count > 1 then
-    msg = string.format("Running for %s files in %s scope...", count, scope:upper())
+
+  if examples and scope == "failures" then
+    local files = {}
+    for _, entry in pairs(examples) do
+      local filename = string.match(entry, ".*_spec%.rb")
+      files[filename] = true
+    end
+    msg = string.format("Running for %s failures in %s files...", #examples, #vim.tbl_keys(files))
+  elseif examples and #examples > 1 then
+    msg = string.format("Running for %s files in %s scope...", #examples, scope:upper())
   else
     msg = string.format("Running in %s scope...", scope:upper())
   end

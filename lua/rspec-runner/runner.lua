@@ -97,6 +97,33 @@ function M.from_last(last_runner, output, config)
   }
 end
 
+---@param output Output
+---@param config Config
+---@param opts? table
+---@return Runner
+function M.from_failures(output, config, opts)
+  local files = {}
+  local env = Env.build()
+
+  opts = opts or {}
+
+  for _, example in pairs(output.examples) do
+    if example.status == "failed" then
+      table.insert(files, example.id)
+    end
+  end
+
+  local cmd = M.build_cmd(files, config, opts)
+
+  return {
+    cmd = cmd,
+    env = env,
+    scope = "failures",
+    files = files,
+    opts = opts,
+  }
+end
+
 ---@return number?
 function M.find_nearest()
   local lang = "ruby"

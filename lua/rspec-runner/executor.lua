@@ -17,7 +17,7 @@ function M.execute(runner, config, state)
   local passed_count = 0
   local failed_count = 0
 
-  notifier:run_start(runner.scope, #runner.files)
+  notifier:run_start(runner.scope, runner.files)
   print(string.format("[RspecRunner][INFO]: Running in %s scope", runner.scope:upper()))
 
   local function on_stdout(err, data)
