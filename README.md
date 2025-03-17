@@ -3,15 +3,25 @@
 Runs rspec inside nvim and collects results for convenient browsing of results and populating diagnostics.
 
 ## Available commands
-`RspecRunnerAll`  runs all test in the project
+`RspecRunnerAll` runs all tests in the project
 
 `RspecRunnerBase` runs tests for files that changed since the `base` commit/branch, defaults to "master"
+
+`RspecRunnerFailures` runs tests only for the examples that failed in the last run
 
 `RspecRunnerFile` runs tests for current file if a specfile exists
 
 `RspecRunnerLast` re-runs with the last settings
 
 `RspecRunnerNearest` runs tests for `it`, `context`, `describe` nearest to cursor
+
+`RspecRunnerTermAll` runs all inside neovim terminal
+
+`RspecRunnerTermBase` runs base inside neovim terminal
+
+`RspecRunnerFile` runs for current file inside neovim terminal
+
+`RspecRunnerNearest` runs for nearest scope inside neovim terminal
 
 `RspecRunnerCancel` cancels current run
 
