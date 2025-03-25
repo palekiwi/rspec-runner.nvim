@@ -205,7 +205,7 @@ end
 ---@param base string branch name or commit hash
 ---@return string[]
 function M.changed_files(base)
-  local command = "git diff --name-only $(git merge-base HEAD " .. base .. " )"
+  local command = "git diff --name-only --diff-filter=d $(git merge-base HEAD " .. base .. " )"
 
   local handle = assert(io.popen(command))
   local result = handle:read("*a")
