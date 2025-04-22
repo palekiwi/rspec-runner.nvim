@@ -61,8 +61,12 @@ function M.term_run(scope)
   end
 
   if scope == "last" then
-    notifier:error("Not supported in term.")
-    return
+    if M.state.output == nil or M.state.runner == nil then
+      notifier:error("No previous runs.")
+      return
+    end
+
+    runner = Runner.from_last(M.state.runner, M.state.output, M.config, { term = true })
   else
     err, runner = Runner.new(scope, M.config, { term = true })
     if err then
@@ -128,6 +132,7 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerTermBase", function() M.term_run("base") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermFile", function() M.term_run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermNearest", function() M.term_run("nearest") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermLast", function() M.term_run("last") end, {})
 
   vim.api.nvim_create_autocmd("User", {
     pattern = "TelescopePreviewerLoaded",

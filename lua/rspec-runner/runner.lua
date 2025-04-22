@@ -73,8 +73,9 @@ end
 ---@param last_runner Runner
 ---@param output Output
 ---@param config Config
+---@param opts? table
 ---@return Runner
-function M.from_last(last_runner, output, config)
+function M.from_last(last_runner, output, config, opts)
   local files = {}
   local env = last_runner.env
   local scope = last_runner.scope
@@ -93,7 +94,7 @@ function M.from_last(last_runner, output, config)
     env = env,
     scope = scope,
     files = files,
-    cmd = M.build_cmd(files, config)
+    cmd = M.build_cmd(files, config, opts)
   }
 end
 
@@ -164,7 +165,7 @@ function M.build_cmd(files, config, opts)
   end
 
   if type(config.cmd) == "function" then
-    cmd = config.cmd(vim.deepcopy(flags), vim.deepcopy(files))
+    cmd = config.cmd(vim.deepcopy(flags), files)
   else
     local args = utils.concat(flags, files)
     cmd = utils.concat(config.cmd --[[@as table]], args)

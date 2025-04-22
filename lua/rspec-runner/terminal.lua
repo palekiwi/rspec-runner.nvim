@@ -11,9 +11,15 @@ end
 
 ---@param runner Runner
 function M.execute(runner)
-  local cmd = vim.deepcopy(runner.cmd)
+  local escaped_cmd = vim.tbl_map(
+    function(item)
+      -- escape all '[' and ']' which occur in spec identifiers
+      return item:gsub("([%[%]])", "\\%1")
+    end,
+    runner.cmd
+  )
 
-  M.small_terminal(vim.fn.join(cmd, " "))
+  M.small_terminal(vim.fn.join(escaped_cmd, " "))
 end
 
 return M
