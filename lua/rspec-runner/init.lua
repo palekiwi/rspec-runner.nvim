@@ -128,6 +128,13 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerTermBase", function() M.term_run("base") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermFile", function() M.term_run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermNearest", function() M.term_run("nearest") end, {})
+
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "TelescopePreviewerLoaded",
+    callback = function(_)
+      vim.wo.wrap = true
+    end,
+  })
 end
 
 return M
