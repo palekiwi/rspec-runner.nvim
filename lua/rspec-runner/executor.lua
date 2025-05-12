@@ -36,7 +36,10 @@ function M.execute(runner, config, state)
       notifier:error("An error has occurred:\n" ..err)
       return
     elseif data then
-      table.insert(errors, data)
+      -- ignore deprecation warnings
+      if string.match(data, "^DEPRECATION WARNING:") == nil then
+        table.insert(errors, data)
+      end
     end
   end
 
