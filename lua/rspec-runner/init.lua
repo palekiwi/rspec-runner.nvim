@@ -67,6 +67,13 @@ function M.term_run(scope)
     end
 
     runner = Runner.from_last(M.state.runner, M.state.output, M.config, { term = true })
+  elseif scope == "failures" then
+    if M.state.output == nil or M.state.output.failed_count == 0 then
+      notifier:error("No previous failures.")
+      return
+    end
+
+    runner = Runner.from_failures(M.state.output, M.config, { term = true })
   else
     err, runner = Runner.new(scope, M.config, { term = true })
     if err then
@@ -126,13 +133,16 @@ function M.setup(cfg)
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
   vim.api.nvim_create_user_command("RspecRunnerNearest", function() M.run("nearest") end, {})
+
   vim.api.nvim_create_user_command("RspecRunnerCancel", function() M.cancel_run(M.state) end, {})
   vim.api.nvim_create_user_command("RspecRunnerShowResults", function() M.browse(M.state, M.config) end, {})
+
   vim.api.nvim_create_user_command("RspecRunnerTermAll", function() M.term_run("all") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermBase", function() M.term_run("base") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermFailures", function() M.term_run("failures") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermFile", function() M.term_run("file") end, {})
-  vim.api.nvim_create_user_command("RspecRunnerTermNearest", function() M.term_run("nearest") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermLast", function() M.term_run("last") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermNearest", function() M.term_run("nearest") end, {})
 
   vim.api.nvim_create_autocmd("User", {
     pattern = "TelescopePreviewerLoaded",
