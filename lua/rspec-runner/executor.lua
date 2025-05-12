@@ -104,8 +104,6 @@ function M.execute(runner, config, state)
       vim.diagnostic.set(ns, bufnr, entries, {})
     end
 
-    print(string.format("[RspecRunner][DEBUG]: Run with command: %s", vim.fn.join(runner.cmd, " ")))
-
     if vim.tbl_isempty(failed) then
       notifier:run_passed(passed_count)
       print(string.format("[RspecRunner][INFO]: %s examples passed.", passed_count))
