@@ -44,13 +44,13 @@ function M.execute(runner, config, state)
   end
 
   local function on_exit()
-    if #errors > 0 then
-      print("[RspecRunner][DEBUG]: Run with command: `" .. vim.fn.join(runner.cmd, " ") .. "`")
-      for _, line in pairs(errors) do
-        print("[RspecRunner][ERROR]: " .. line)
-      end
-      print(string.format("[RspecRunner][ERROR]: %s errors.", #errors))
-    end
+    -- if #errors > 0 then
+    --   print("[RspecRunner][DEBUG]: Run with command: `" .. vim.fn.join(runner.cmd, " ") .. "`")
+    --   for _, line in pairs(errors) do
+    --     print("[RspecRunner][ERROR]: " .. line)
+    --   end
+    --   print(string.format("[RspecRunner][ERROR]: %s errors.", #errors))
+    -- end
 
     -- check if the run has been cancelled
     if state.job:is_closing() then
