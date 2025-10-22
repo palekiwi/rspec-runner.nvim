@@ -109,6 +109,9 @@ end
 
 ---@param cfg UserConfig
 function M.setup(cfg)
+  local base_config = vim.deepcopy(require "rspec-runner.config")
+  M.config = base_config
+
   if cfg ~= nil then
     local default_config = cfg.defaults or {}
     local projects_config = cfg.projects or {}
