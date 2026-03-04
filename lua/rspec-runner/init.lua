@@ -9,7 +9,7 @@ local M = {
   state = require("rspec-runner.state").new()
 }
 
----@alias Scope "all" | "base" | "failures" | "file" | "last" | "nearest" |
+---@alias Scope "all" | "base" | "staged" | "failures" | "file" | "last" | "nearest" |
 
 ---@param scope Scope
 function M.run(scope)
@@ -132,6 +132,7 @@ function M.setup(cfg)
 
   vim.api.nvim_create_user_command("RspecRunnerAll", function() M.run("all") end, {})
   vim.api.nvim_create_user_command("RspecRunnerBase", function() M.run("base") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerStaged", function() M.run("staged") end, {})
   vim.api.nvim_create_user_command("RspecRunnerFailures", function() M.run("failures") end, {})
   vim.api.nvim_create_user_command("RspecRunnerFile", function() M.run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerLast", function() M.run("last") end, {})
@@ -142,6 +143,7 @@ function M.setup(cfg)
 
   vim.api.nvim_create_user_command("RspecRunnerTermAll", function() M.term_run("all") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermBase", function() M.term_run("base") end, {})
+  vim.api.nvim_create_user_command("RspecRunnerTermStaged", function() M.term_run("staged") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermFailures", function() M.term_run("failures") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermFile", function() M.term_run("file") end, {})
   vim.api.nvim_create_user_command("RspecRunnerTermLast", function() M.term_run("last") end, {})

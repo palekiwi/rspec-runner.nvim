@@ -55,6 +55,11 @@ function M.new(scope, config, opts)
     if (#files) == 0 then
       return "No specs found in scope BASE for: " .. base, runner
     end
+  elseif scope == "staged" then
+    files = M.specs_for_staged()
+    if (#files) == 0 then
+      return "No specs found for staged files.", runner
+    end
   end
 
   local cmd = M.build_cmd(files, config, opts)
@@ -203,12 +208,11 @@ function M.spec_for(filepath)
   end
 end
 
----@param base string branch name or commit hash
+---@param command string
 ---@return string[]
-function M.changed_files(base)
-  local command = "git diff --name-only --diff-filter=d $(git merge-base HEAD " .. base .. " )"
-
-  local handle = assert(io.popen(command))
+function M.git_files(command)
+  local handle = io.popen(command)
+  if not handle then return {} end
   local result = handle:read("*a")
   handle:close()
 
@@ -222,10 +226,24 @@ function M.changed_files(base)
 end
 
 ---@param base string branch name or commit hash
-function M.specs_for_base(base)
+---@return string[]
+function M.changed_files(base)
+  local command = "git diff --name-only --diff-filter=d $(git merge-base HEAD " .. base .. " )"
+  return M.git_files(command)
+end
+
+---@return string[]
+function M.staged_files()
+  local command = "git diff --cached --name-only --diff-filter=d"
+  return M.git_files(command)
+end
+
+---@param files string[]
+---@return string[]
+function M.specs_for(files)
   local set = {}
 
-  for _, el in ipairs(M.changed_files(base)) do
+  for _, el in ipairs(files) do
     local spec = M.spec_for(el)
 
     if spec then
@@ -234,6 +252,16 @@ function M.specs_for_base(base)
   end
 
   return vim.tbl_keys(set)
+end
+
+---@param base string branch name or commit hash
+function M.specs_for_base(base)
+  return M.specs_for(M.changed_files(base))
+end
+
+---@return string[]
+function M.specs_for_staged()
+  return M.specs_for(M.staged_files())
 end
 
 return M
