@@ -53,6 +53,39 @@ describe("Runner", function()
       end)
     end)
 
+    context("with {files} placeholder in cmd", function()
+      it("injects only files into the placeholder", function()
+        helpers.view_file(specfile)
+
+        local config = build_config()
+        config.cmd = { "docker", "compose", "run", "whitesales", "script/runspecs.sh {files}" }
+        local _, runner = Runner.new("file", config)
+
+        assert.are.same({
+          "docker",
+          "compose",
+          "run",
+          "whitesales",
+          "script/runspecs.sh ./spec/fixtures/adder_spec.rb"
+        }, runner.cmd)
+      end)
+    end)
+
+    context("with {flags} placeholder in cmd", function()
+      it("injects only flags into the placeholder", function()
+        helpers.view_file(specfile)
+
+        local config = build_config()
+        config.cmd = { "rspec", "{flags}" }
+        local _, runner = Runner.new("file", config, { term = true })
+
+        assert.are.same({
+          "rspec",
+          "--format documentation"
+        }, runner.cmd)
+      end)
+    end)
+
     context("when called with scope `file`", function()
       context("when the file is a spec file", function()
         it("it creates a runner for the current file", function()
