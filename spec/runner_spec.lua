@@ -35,6 +35,24 @@ describe("Runner", function()
       end)
     end)
 
+    context("with placeholder in cmd", function()
+      it("injects args into the placeholder", function()
+        helpers.view_file(specfile)
+
+        local config = build_config()
+        config.cmd = { "docker", "compose", "run", "whitesales", "script/runspecs.sh {}" }
+        local _, runner = Runner.new("file", config)
+
+        assert.are.same({
+          "docker",
+          "compose",
+          "run",
+          "whitesales",
+          "script/runspecs.sh --format json ./spec/fixtures/adder_spec.rb"
+        }, runner.cmd)
+      end)
+    end)
+
     context("when called with scope `file`", function()
       context("when the file is a spec file", function()
         it("it creates a runner for the current file", function()
