@@ -56,7 +56,34 @@ return {
 }
 ```
 The `cmd` can be either a `string[]` or `fun(rspec_args: string[], files: string[]): string[]`.
-If the project uses a wrapper around `rspec`, you can construct the command by passing a function, for example:
+
+### Command Placeholders
+When using a table for `cmd`, you can use placeholders to control where the RSpec arguments and file paths are injected. This is particularly useful for complex commands that wrap the execution in a string.
+
+- `{}`: Injects both RSpec flags and file paths (e.g., `--format json spec/models/user_spec.rb`).
+- `{files}`: Injects only the spec file paths.
+- `{flags}`: Injects only the RSpec flags.
+
+#### Example: Docker Compose with a wrapper script
+If you need to pass arguments into a quoted string for a remote execution script:
+
+```lua
+cmd = {
+  "docker", "compose", "run", "--rm", "app",
+  "script/runspecs.sh {files}"
+}
+```
+
+This also works via environment variables:
+
+```bash
+export RSPEC_RUNNER_CMD='docker compose run --rm app "script/runspecs.sh {files}"'
+```
+
+If no placeholder is present, the arguments are simply appended to the end of the command.
+
+### Custom Command Function
+If the project uses a wrapper around `rspec`, you can also construct the command by passing a function:
 
 ```lua
 ...
