@@ -19,6 +19,7 @@ function M.execute(runner, config, state)
 
   notifier:run_start(runner.scope, runner.files)
   print(string.format("[RspecRunner][INFO]: Running in %s scope", runner.scope:upper()))
+  print(string.format("[RspecRunner][INFO]: Command: %s", table.concat(runner.cmd, " ")))
 
   local function on_stdout(err, data)
     if err then
