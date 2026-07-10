@@ -4,6 +4,7 @@ pkgs.mkShell {
   name = "rspec-runner";
   buildInputs =
     with pkgs; [
+      go-task
       luajit
       luajitPackages.busted
       luajitPackages.nlua
