@@ -173,7 +173,44 @@ function M.build_cmd(files, config, opts)
     cmd = config.cmd(vim.deepcopy(flags), files)
   else
     local args = utils.concat(flags, files)
-    cmd = utils.concat(config.cmd --[[@as table]], args)
+    local config_cmd = config.cmd --[[@as table]]
+    local has_placeholder = false
+    cmd = {}
+
+    local flags_str = table.concat(flags, " ")
+    local files_str = table.concat(files, " ")
+    local all_args_str = table.concat(args, " ")
+
+    for _, arg in ipairs(config_cmd) do
+      local new_arg = arg
+      local replaced = false
+
+      if string.find(new_arg, "{}") then
+        new_arg = string.gsub(new_arg, "{}", all_args_str)
+        replaced = true
+      end
+
+      if string.find(new_arg, "{files}") then
+        new_arg = string.gsub(new_arg, "{files}", files_str)
+        replaced = true
+      end
+
+      if string.find(new_arg, "{flags}") then
+        new_arg = string.gsub(new_arg, "{flags}", flags_str)
+        replaced = true
+      end
+
+      if replaced then
+        has_placeholder = true
+        table.insert(cmd, new_arg)
+      else
+        table.insert(cmd, arg)
+      end
+    end
+
+    if not has_placeholder then
+      cmd = utils.concat(config_cmd, args)
+    end
   end
 
   return cmd
