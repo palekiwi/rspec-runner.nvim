@@ -7,6 +7,8 @@ Runs rspec inside nvim and collects results for convenient browsing of results a
 
 `RspecRunnerBase` runs tests for files that changed since the `base` commit/branch, defaults to "master"
 
+`RspecRunnerStaged` runs tests for files that are currently staged in git
+
 `RspecRunnerFailures` runs tests only for the examples that failed in the last run
 
 `RspecRunnerFile` runs tests for current file if a specfile exists
@@ -18,6 +20,8 @@ Runs rspec inside nvim and collects results for convenient browsing of results a
 `RspecRunnerTermAll` runs all inside neovim terminal
 
 `RspecRunnerTermBase` runs base inside neovim terminal
+
+`RspecRunnerTermStaged` runs staged inside neovim terminal
 
 `RspecRunnerFile` runs for current file inside neovim terminal
 
