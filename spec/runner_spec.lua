@@ -87,6 +87,27 @@ describe("Runner", function()
     end)
 
     context("when called with scope `file`", function()
+      context("when the buffer is loaded with an absolute path", function()
+        it("normalizes the path to be relative to cwd", function()
+          helpers.view_file(specfile)
+          local bufnr = vim.api.nvim_get_current_buf()
+          local absolute = vim.fn.fnamemodify(specfile, ":p")
+
+          -- neovim sometimes loads a buffer with an absolute path; force that
+          -- state so the spec is independent of the test runner's shortening.
+          vim.api.nvim_buf_set_name(bufnr, absolute)
+          finally(function()
+            pcall(vim.api.nvim_buf_set_name, bufnr, specfile)
+          end)
+
+          local config = build_config()
+          local err, runner = Runner.new("file", config)
+
+          assert.falsy(err)
+          assert.are.same({ "rspec", "--format", "json", "spec/fixtures/adder_spec.rb" }, runner.cmd)
+        end)
+      end)
+
       context("when the file is a spec file", function()
         it("it creates a runner for the current file", function()
           helpers.view_file(specfile)
