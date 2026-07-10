@@ -28,7 +28,7 @@ describe("Runner", function()
 
         assert.falsy(err)
         assert.equal(vim.fn.getcwd(), runner.env.cwd)
-        assert.equal("./spec/fixtures/adder_spec.rb", runner.env.filename)
+        assert.equal("spec/fixtures/adder_spec.rb", runner.env.filename)
         assert.equal(1, runner.env.line)
         assert.equal("all", runner.scope)
         assert.are.same({ "rspec", "--format", "json" }, runner.cmd)
@@ -48,7 +48,7 @@ describe("Runner", function()
           "compose",
           "run",
           "whitesales",
-          "script/runspecs.sh --format json ./spec/fixtures/adder_spec.rb"
+          "script/runspecs.sh --format json spec/fixtures/adder_spec.rb"
         }, runner.cmd)
       end)
     end)
@@ -66,7 +66,7 @@ describe("Runner", function()
           "compose",
           "run",
           "whitesales",
-          "script/runspecs.sh ./spec/fixtures/adder_spec.rb"
+          "script/runspecs.sh spec/fixtures/adder_spec.rb"
         }, runner.cmd)
       end)
     end)
@@ -96,7 +96,7 @@ describe("Runner", function()
 
           assert.falsy(err)
           assert.equal("file", runner.scope)
-          assert.are.same({ "rspec", "--format", "json", "./spec/fixtures/adder_spec.rb" }, runner.cmd)
+          assert.are.same({ "rspec", "--format", "json", "spec/fixtures/adder_spec.rb" }, runner.cmd)
         end)
       end)
 
