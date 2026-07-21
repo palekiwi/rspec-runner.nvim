@@ -165,4 +165,80 @@ describe("Runner", function()
       end)
     end)
   end)
+
+  describe("#find_nearest", function()
+    -- spec/fixtures/adder_spec.rb layout (1-based lines):
+    --   3  RSpec.describe Adder do
+    --   4    describe '#add' do
+    --   5      context 'when adding two numbers' do
+    --   6        it 'returns a sum' do
+    --   7          result = Adder.add(1, 2)
+    --   ...
+    --   12        it 'makes a mistake' do
+    --   ...
+    --   18        it 'makes a mistake again' do
+    context("when the cursor is inside an `it` block body", function()
+      it("returns the line of that `it`", function()
+        helpers.view_file(specfile, 7) -- inside `it 'returns a sum'`
+        assert.equal(6, Runner.find_nearest())
+      end)
+
+      it("returns the line of the second `it` when cursor is in it", function()
+        helpers.view_file(specfile, 13) -- inside `it 'makes a mistake'`
+        assert.equal(12, Runner.find_nearest())
+      end)
+    end)
+
+    context("when the cursor is inside the enclosing describe/context", function()
+      it("returns the first nested example's line", function()
+        -- line 11 is the blank line between the first two `it` blocks; the
+        -- cursor sits inside the `context` body but outside any `it`.
+        helpers.view_file(specfile, 11)
+        local line = Runner.find_nearest()
+        assert.truthy(line)
+        assert.equal(6, line) -- first `it` in iteration order
+      end)
+    end)
+
+    context("when the cursor is above the nested examples", function()
+      -- Characterization: walking parents from line 1 reaches the file root,
+      -- whose first match is `describe '#add'` on line 4. This documents the
+      -- existing "run up to the nearest enclosing block" semantics rather
+      -- than a stricter nil-return; it is not the focus of this change.
+      it("returns the first enclosing block's line", function()
+        helpers.view_file(specfile, 1)
+        assert.equal(4, Runner.find_nearest())
+      end)
+    end)
+
+    context("when the buffer has no rspec blocks at all", function()
+      it("returns nil", function()
+        helpers.view_file(sourcefile) -- spec/fixtures/adder.rb: no describe/it
+        assert.falsy(Runner.find_nearest())
+      end)
+    end)
+  end)
+
+  describe("#new", function()
+    context("when called with scope `nearest`", function()
+      it("builds a command targeting the nearest example's line", function()
+        helpers.view_file(specfile, 7) -- inside `it 'returns a sum'` (line 6)
+
+        local config = build_config()
+        local err, runner = Runner.new("nearest", config)
+
+        assert.falsy(err)
+        assert.equal("nearest", runner.scope)
+        assert.are.same({ "rspec", "--format", "json", "spec/fixtures/adder_spec.rb:6" }, runner.cmd)
+      end)
+
+      it("returns an error when the buffer is not a specfile", function()
+        helpers.view_file(sourcefile)
+
+        local config = build_config()
+        local err = Runner.new("nearest", config)
+        assert.equal("Not a specfile.", err)
+      end)
+    end)
+  end)
 end)

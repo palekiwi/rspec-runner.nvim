@@ -3,7 +3,6 @@ local utils = require "rspec-runner.utils"
 local Env = require "rspec-runner.env"
 
 local ts = vim.treesitter
-local parsers = require "nvim-treesitter.parsers"
 
 ---@class Runner
 ---@field cmd string[]
@@ -135,7 +134,11 @@ function M.find_nearest()
   local lang = "ruby"
   local line = nil
 
-  parsers.get_parser(0, lang)
+  -- Attach the ruby parser to the current buffer so `ts.get_node()` below
+  -- returns a valid node. Uses the core nvim API (stable since 0.9); the
+  -- previous `nvim-treesitter.parsers.get_parser` call was a thin wrapper
+  -- around this and was removed when nvim-treesitter became installer-only.
+  ts.get_parser(0, lang)
   local query = ts.query.parse(lang, rspec_query)
 
   local curnode = ts.get_node()
